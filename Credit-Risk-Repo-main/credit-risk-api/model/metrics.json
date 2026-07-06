@@ -1,0 +1,84 @@
+{
+  "logistic_regression": {
+    "roc_auc": 0.8974453744553751,
+    "average_precision": 0.8772038606948904,
+    "confusion_matrix": [
+      [
+        2808,
+        603
+      ],
+      [
+        551,
+        2038
+      ]
+    ],
+    "classification_report": {
+      "0": {
+        "precision": 0.8359630842512653,
+        "recall": 0.8232189973614775,
+        "f1-score": 0.8295420974889217,
+        "support": 3411.0
+      },
+      "1": {
+        "precision": 0.7716773949261644,
+        "recall": 0.787176516029355,
+        "f1-score": 0.7793499043977056,
+        "support": 2589.0
+      },
+      "accuracy": 0.8076666666666666,
+      "macro avg": {
+        "precision": 0.8038202395887148,
+        "recall": 0.8051977566954163,
+        "f1-score": 0.8044460009433136,
+        "support": 6000.0
+      },
+      "weighted avg": {
+        "precision": 0.8082238093074843,
+        "recall": 0.8076666666666666,
+        "f1-score": 0.807884166170062,
+        "support": 6000.0
+      }
+    }
+  },
+  "random_forest": {
+    "roc_auc": 0.8683394180937574,
+    "average_precision": 0.8449912899424268,
+    "confusion_matrix": [
+      [
+        2691,
+        720
+      ],
+      [
+        619,
+        1970
+      ]
+    ],
+    "classification_report": {
+      "0": {
+        "precision": 0.8129909365558913,
+        "recall": 0.7889182058047494,
+        "f1-score": 0.8007736943907157,
+        "support": 3411.0
+      },
+      "1": {
+        "precision": 0.7323420074349443,
+        "recall": 0.7609115488605639,
+        "f1-score": 0.7463534760371282,
+        "support": 2589.0
+      },
+      "accuracy": 0.7768333333333334,
+      "macro avg": {
+        "precision": 0.7726664719954177,
+        "recall": 0.7749148773326566,
+        "f1-score": 0.773563585213922,
+        "support": 6000.0
+      },
+      "weighted avg": {
+        "precision": 0.7781909236402027,
+        "recall": 0.7768333333333334,
+        "f1-score": 0.7772913701711426,
+        "support": 6000.0
+      }
+    }
+  }
+}

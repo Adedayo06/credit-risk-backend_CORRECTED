@@ -1,0 +1,5 @@
+probability_of_default,risk_band,recommendation
+0.6781402214644113,E,Decline
+0.37345293975981914,E,Decline
+0.5150811912154628,E,Decline
+0.07777230501780742,B,Approve
