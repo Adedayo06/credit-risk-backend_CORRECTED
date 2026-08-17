@@ -12,7 +12,8 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, create_engine
 from sqlalchemy.orm import Session, declarative_base, relationship, sessionmaker
-import sqlite3
+
+from model_drift.psi_report import generate_psi_report
 
 MODEL_API_BASE_URL = os.getenv("MODEL_API_BASE_URL", "http://127.0.0.1:8000")
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./credit_risk_scores.db")
@@ -127,13 +128,17 @@ app = FastAPI(
 )
 
 
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    ).split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -221,6 +226,21 @@ def health_check():
         "model_api_base_url": MODEL_API_BASE_URL,
         "database_url": DATABASE_URL,
     }
+
+
+@app.get("/psi")
+def get_psi():
+    """Population Stability Index drift report.
+
+    Computed here (not in credit-risk-api) because this service owns the
+    scored-records database the comparison needs. Lazily loads its baseline
+    on first call, so a missing baseline/AWS config degrades to a clear 503
+    instead of ever blocking this service from starting.
+    """
+    try:
+        return generate_psi_report(engine)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
 
 
 @app.post("/batch-score", response_model=BatchScoreResponse)

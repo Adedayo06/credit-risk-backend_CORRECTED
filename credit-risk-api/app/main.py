@@ -6,21 +6,27 @@ import json
 import os
 
 from fastapi import HTTPException
-import traceback
 from fastapi.middleware.cors import CORSMiddleware
-from model_drift.psi_report import generate_psi_report
+
+# credit-risk-api is a pure, stateless model-scoring service: no database,
+# no S3, no dependency on any other service. Drift/PSI reporting lives in
+# batch-api instead, since that's the service that actually owns the scored
+# records the drift comparison needs (see batch-api/model_drift/).
 app = FastAPI()
 
 MODEL_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "model")
 
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+    ).split(",")
+    if origin.strip()
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -105,7 +111,3 @@ def score(application: CreditApplication):
         "risk_band": risk_band,
         "recommendation": recommendation
     }
-@app.get("/psi")
-def get_psi():
-
-    return  generate_psi_report()
