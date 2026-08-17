@@ -5,7 +5,5 @@ __pycache__/
 venv/
 .git/
 .gitignore
-*.ipynb
+credit_risk_scores.db
 .pytest_cache/
-k8s/
-README.md

@@ -1,0 +1,39 @@
+# Render Blueprint — deploys both backend services from this one repo.
+# In the Render dashboard: New -> Blueprint -> pick this repo -> Apply.
+#
+# Deploy order note: credit-risk-model-api has no dependencies and can go
+# first. credit-risk-batch-api needs MODEL_API_BASE_URL set to
+# credit-risk-model-api's live URL (Render will prompt for it on first
+# deploy since it's marked sync: false below) — set it once you have that
+# URL, e.g. https://credit-risk-model-api.onrender.com.
+#
+# ALLOWED_ORIGINS on both services should be set to your deployed Vercel
+# frontend URL(s), comma-separated if you have more than one
+# (e.g. your production domain + preview deployments).
+
+services:
+  - type: web
+    name: credit-risk-model-api
+    runtime: docker
+    rootDir: credit-risk-api
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ALLOWED_ORIGINS
+        sync: false
+
+  - type: web
+    name: credit-risk-batch-api
+    runtime: docker
+    rootDir: batch-api
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: MODEL_API_BASE_URL
+        sync: false
