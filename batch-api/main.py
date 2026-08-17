@@ -18,6 +18,23 @@ from model_drift.psi_report import generate_psi_report
 MODEL_API_BASE_URL = os.getenv("MODEL_API_BASE_URL", "http://127.0.0.1:8000")
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./credit_risk_scores.db")
 
+# Render's managed Postgres (and Heroku-style providers generally) hand out
+# connection strings starting "postgres://", but SQLAlchemy 1.4+/psycopg2
+# require the "postgresql://" scheme. Normalize so DATABASE_URL can be set
+# to whatever the provider gives you, verbatim, without a manual edit.
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+
+def _mask_database_url(url: str) -> str:
+    """Redact credentials before ever putting a DB URL in an API response."""
+    if "://" not in url:
+        return url
+    scheme, rest = url.split("://", 1)
+    if "@" in rest:
+        rest = rest.split("@", 1)[1]
+    return f"{scheme}://***@{rest}" if "@" in url else f"{scheme}://{rest}"
+
 
 engine = create_engine(
     DATABASE_URL,
@@ -224,7 +241,9 @@ def health_check():
         "status": "ok",
         "service": "credit-risk-batch-api",
         "model_api_base_url": MODEL_API_BASE_URL,
-        "database_url": DATABASE_URL,
+        # Credentials redacted — this endpoint is public. Still useful to
+        # confirm at a glance whether you're pointed at sqlite or Postgres.
+        "database_url": _mask_database_url(DATABASE_URL),
     }
 
 

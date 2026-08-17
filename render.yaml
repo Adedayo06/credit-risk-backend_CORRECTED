@@ -1,4 +1,5 @@
-# Render Blueprint — deploys both backend services from this one repo.
+# Render Blueprint — deploys both backend services (+ a managed Postgres
+# database for batch-api) from this one repo.
 # In the Render dashboard: New -> Blueprint -> pick this repo -> Apply.
 #
 # Deploy order note: credit-risk-model-api has no dependencies and can go
@@ -7,9 +8,18 @@
 # deploy since it's marked sync: false below) — set it once you have that
 # URL, e.g. https://credit-risk-model-api.onrender.com.
 #
+# DATABASE_URL for credit-risk-batch-api is wired automatically to the
+# credit-risk-db Postgres instance below — no manual value needed. Score
+# reports persist across deploys/restarts instead of resetting like the
+# local SQLite file does.
+#
 # ALLOWED_ORIGINS on both services should be set to your deployed Vercel
 # frontend URL(s), comma-separated if you have more than one
 # (e.g. your production domain + preview deployments).
+
+databases:
+  - name: credit-risk-db
+    plan: free
 
 services:
   - type: web
@@ -37,3 +47,7 @@ services:
         sync: false
       - key: MODEL_API_BASE_URL
         sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: credit-risk-db
+          property: connectionString
