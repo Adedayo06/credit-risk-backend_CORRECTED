@@ -235,6 +235,11 @@ class BatchScoreResponse(BaseModel):
     errors: List[BatchScoreError]
 
 
+@app.get("/")
+def root():
+    return {"message": "Credit Risk Batch Scoring API is running"}
+
+
 @app.get("/health")
 def health_check():
     return {
